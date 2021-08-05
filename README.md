@@ -121,6 +121,7 @@ MongoDB
     db.COLLECTION_NAME.find().limit(NUMBER).skip(NUMBER)
     db.COLLECTION_NAME.find().sort({KEY:1/0/-1})
 
+    
     Opertion Cluases
 
         Operation	            Syntax	
@@ -138,9 +139,17 @@ MongoDB
         Or                      { $or: [ {<key1>:<value1>}, { <key2>:<value2>} ] }
         Not                     { $NOT: [ {key1: value1}, {key2:value2} ] }
 
+    db.COLLECTION_NAME.aggregate(AGGREGATE_OPERATION)
 
+        Operation	            Syntax	
+        ============================================================================
+        $sum	                db.mycol.aggregate([{$group : {_id : "$grpcol", sumCol : {$sum : "$col"}}}])
+        $avg	                db.mycol.aggregate([{$group : {_id : "$grpCol", avgCol : {$avg : "$col"}}}])
+        $min	                db.mycol.aggregate([{$group : {_id : "$grpCol", minCol : {$min : "$col"}}}])
+        $max	                db.mycol.aggregate([{$group : {_id : "$grpCol", maxCol : {$max : "$col"}}}])
+        
 
-    //lt create a bulky collection to learn retrivals
+    //lets create a bulky collection to learn retrivals
 
     db.goods.insert([
         {_id:1,title:"Rice",unit:"25kg Bag",rate:2500,category:"CERALS"},
@@ -170,16 +179,99 @@ MongoDB
     db.goods.find({$and: [{rate:{$gt:600}},{$or:[{category:"BEVERAGES"},{category:"OIL"}]}] })
     db.goods.find({$and: [{rate:{$gt:600}},{$or:[{category:"BEVERAGES"},{category:"OIL"}]}] },{title:1,rate:1,_id:0})
     db.goods.find().sort({category:1,rate:1})
-    
+    db.goods.aggregate([{$group : {_id : "$category", totalRate : {$sum : "$rate"}}}])
+    db.goods.aggregate([{$group : {_id : "$category", avgRate : {$avg : "$rate"}}}])
+    db.goods.aggregate([{$group : {_id : "$category", minRate : {$min : "$rate"}}}])
+    db.goods.aggregate([{$group : {_id : "$category", maxRate : {$max : "$rate"}}}])
+    db.goods.aggregate([{$group : {_id : "$category", maxRate : {$max : "$rate"}}},{$sort:{maxRate:1}}])
+
     Mongo DB Data Types
     -------------------------------------------------------------
-    String 
-    Integer 
-    Boolean 
-    Double 
-    Arrays 
-    Object
+    string 
+    int 
+    boolean 
+    fouble 
+    arrays 
+    object
     Date 
     Object ID 
     Binary data
     Code             This datatype is used to store JavaScript code into the document.
+
+
+    Collection Schema Validation
+    ------------------------------------------------------------------------
+
+    db.createCollection("students", {
+       validator: {
+            $jsonSchema: {
+                bsonType: "object",
+                required: [ "name", "year", "major", "address" ],
+                properties: {
+                    name: {
+                        bsonType: "string",
+                        description: "must be a string and is required"
+                    },
+                    year: {
+                        bsonType: "int",
+                        minimum: 2017,
+                        maximum: 3017,
+                        description: "must be an integer in [ 2017, 3017 ] and is required"
+                    },
+                    major: {
+                        enum: [ "Math", "English", "Computer Science", "History", null ],
+                        description: "can only be one of the enum values and is required"
+                    },
+                    gpa: {
+                        bsonType: "double",
+                        description: "must be a double if the field exists"
+                    },
+                    address: {
+                        bsonType: "object",
+                        required: [ "city" ],
+                        properties: {
+                            street: {
+                                bsonType: "string",
+                                description: "must be a string if the field exists"
+                            },
+                            city: {
+                                bsonType: "string",
+                                description: "must be a string and is required"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    })
+
+    Validating an exiting collection
+    --------------------------------------------------------------------------------------------
+
+    db.runCommand({
+        collMod: "goods",
+        validator: {
+            $jsonSchema: {
+                bsonType: "object",
+                required: [ "title", "unit", "rate", "category" ],
+                properties: {
+                    title: {
+                        bsonType: "string",
+                        description: "must be a string and is required"
+                    },
+                    unit: {
+                        bsonType: "string",
+                        description: "must be a string and is required"
+                    },
+                    category: {
+                        enum: [ "CERALS", "PULSES", "OIL", "Beverages", "OTHERS","FLOURS" ],
+                        description: "can only be one of the enum values and is required"
+                    },
+                    rate: {
+                        bsonType: "double",
+                        description: "must be a double and is required"
+                    }
+                }
+            }
+        }
+    })
