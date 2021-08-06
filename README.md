@@ -275,3 +275,29 @@ MongoDB
             }
         }
     })
+
+    MongoDB with Java
+    -----------------------------------------------------------------------
+        https://www.mongodb.com/blog/post/getting-started-with-mongodb-and-java-part-i
+
+    MongoDB with Python
+    -----------------------------------------------------------------------
+        https://www.mongodb.com/languages/python
+
+    What is MongoDB Atlas
+    -----------------------------------------------------------------------
+
+        MongoDB Atlas is a fully-managed cloud database developed by the same people that build MongoDB. Atlas handles all the complexity of deploying, managing, and healing your deployments on the cloud service provider of your choice (AWS, Azure, and GCP).
+
+    MongoDB Stitch
+    -----------------------------------------------------------------------
+            Autorization and authentication on MongoDB clouds.USed sclae or scale down
+            the manogdb managed instances.
+
+    MongoDB Ops Manager
+    -----------------------------------------------------------------------
+
+            Crating aor dropping mongodb instances for better scalalbility.
+            it can alsoe be used to bakcup and restore your mongodb instances.
+
+    
